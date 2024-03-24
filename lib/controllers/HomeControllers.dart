@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:get/get.dart';
 import 'package:projeto/repositories/GoogleSearchAPI.dart';
 import '../models/Item.dart';
