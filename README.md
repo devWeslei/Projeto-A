@@ -1,7 +1,9 @@
 # Projeto A    
 
 ## Demo    
-
+<p align="center">
+  <img alt="Demo" src="https://github.com/devWeslei/Projeto-A/blob/main/lib/assets/demo.gif">
+</p>
 
 ## Sobre o projeto    
 App usando:   
