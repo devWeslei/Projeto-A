@@ -25,14 +25,13 @@ App usando:
 -Dart SDK version: 3.3.2 (stable).     
 
 ## Como rodar    
-### baixe o projeto:   
-## no terminal, digite:   
+## baixe o projeto pelo terminal, digite:   
 `git clone https://github.com/devWeslei/Projeto-A.git`   
 
-### import as dependências:   
+## import as dependências:   
 `flutter pub get`    
 
-### rode a aplicação:
+## rode a aplicação:
 `flutter run`   
 
 </br>
