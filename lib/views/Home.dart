@@ -5,12 +5,26 @@ import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_instance/get_instance.dart';
 import 'package:projeto/controllers/HomeControllers.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 import '../models/DialogWidget.dart';
 
 class Home extends StatelessWidget {
-  Home({super.key});
+  Home({
+    Key? key,
+  }) : super(key: key);
 
   final HomeController controller = Get.put(HomeController());
+
+  _validateField() {
+    String search = controller.searchText.value;
+
+    if (search.isNotEmpty) {
+      controller.search();
+    } else {
+      controller.results.clear();
+      DialogWidget('Ops!', 'Preencha o campo de busca!').showDialog();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +42,7 @@ class Home extends StatelessWidget {
             textAlign: TextAlign.center,
           ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(02, 02, 02, 02),
+            padding: const EdgeInsets.fromLTRB(12, 02, 12, 02),
             child: TextField(
               onChanged: (text) => controller.searchText.value = text,
               buildCounter: (BuildContext context,
@@ -59,7 +73,7 @@ class Home extends StatelessWidget {
                   borderRadius: BorderRadius.circular(32),
                 ),
               ),
-              onPressed: () => controller.search(),
+              onPressed: () => _validateField(),
               child: const Text(
                 "Pesquisar",
                 style: TextStyle(color: Colors.white, fontSize: 20),
@@ -73,7 +87,15 @@ class Home extends StatelessWidget {
                     final item = controller.results[index];
                     return ListTile(
                       title: Text(item.title),
-                      subtitle: Text(item.link),
+                      subtitle: InkWell(
+                        onTap: () => launchUrlString(item.link),
+                        child: Text(
+                          item.link,
+                          style: const TextStyle(
+                            color: Colors.blue,
+                          ),
+                        ),
+                      ),
                     );
                   },
                 )),

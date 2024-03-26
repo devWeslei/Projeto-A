@@ -1,7 +1,5 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 
 class SplashScreen extends StatefulWidget {
   final int duration;
@@ -17,11 +15,10 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-
   @override
   void initState() {
     super.initState();
-    Future.delayed(Duration(milliseconds:widget.duration), () {
+    Future.delayed(Duration(milliseconds: widget.duration), () {
       Get.offAllNamed(widget.nextScreen);
     });
   }

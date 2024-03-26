@@ -8,8 +8,6 @@ void main() {
   runApp(GetMaterialApp(
     debugShowCheckedModeBanner: false,
     getPages: Routes.routes,
-    home: SplashScreen(nextScreen:'/Home', duration: 5000),
+    home: SplashScreen(nextScreen: '/Home', duration: 3000),
   ));
 }
-
-
