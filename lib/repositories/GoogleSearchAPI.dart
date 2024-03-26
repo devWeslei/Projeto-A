@@ -1,59 +1,56 @@
-
-import 'package:html/dom.dart';
-import 'package:html/parser.dart';
 import 'package:http/http.dart' as http;
+import 'package:html/parser.dart' as htmlParser;
+import 'package:html/dom.dart' as html;
+import 'package:projeto/models/Item.dart';
 
 class GoogleSearchAPI {
-  static Future<List<Map<String, String?>>> search(String query) async {
-    // URL da pesquisa Google.
-    final url = Uri.https('www.google.com', '/search', {'q': query});
+  Future<List<Item>> search(String query) async {
+    final response =
+    await http.get(Uri.parse('https://www.google.com/search?q=$query'));
+    if (response.statusCode == 200) {
+      final document = htmlParser.parse(response.body);
 
-    // Obter o HTML da página de resultados.
-    final response = await http.get(url);
-    final htmlDocument = response.body;
-
-    // Extrair os títulos e links das páginas.
-    final titles = _extractTitles(htmlDocument);
-    final links = _extractLinks(htmlDocument);
-
-    // Combinar títulos e links em uma lista de mapas.
-    final results = List.generate(titles.length, (index) => {
-      'title': titles[index],
-      'link': links[index],
-    });
-
-    return results;
+      return extractSearchResults(document);
+    } else {
+      throw Exception('Failed to load data');
+    }
   }
 
-  static List<String?> _extractTitles(String html) {
-    // Selecionar elementos `h3` com a classe `r`.
-    final elements = _getElementsByClassName(html, 'r', 'h3') as List<Element>;;
+  List<Item> extractSearchResults(html.Document document) {
+    // Esse codigo navega a estrutura html da pagina de resultados do google para descobrir
+    // os titulos e os links associados aos titulos. No momento de implementacao desse metodo
+    // esta era a estrutura atual da pagina resultado de busca do google:
+    //
+    // <div>
+    //  <a>
+    //     <div>
+    //         <div>
+    //          <h3>Título</h3>       *Leitura: Título esta no elemento H3 > nodes[list no indice 0].toString();
+    //         </div>                         e Linke associado está no H3 > div pai > div pai > elemento a > div
+    //     </div>                                                           > "href" -> "Link associado ao título"
+    //
+    //     <div>
+    //       "href" -> "Link associado ao título"
+    //     </div>
+    //  </a>
+    // </div>
 
-    // Extrair o texto de cada elemento.
-    final titles = elements.map((element) => element?.text?.trim()).toList();
-
-    return titles;
-  }
-
-  static List<String> _extractLinks(String html) {
-    // Selecionar elementos `a` com a classe `r`.
-    final elements = _getElementsByClassName(html, 'r', 'a');
-
-    // Extrair o atributo `href` de cada elemento.
-    final links = elements.map((element) => element.attributes['href']).toList();
-
-    // Corrigir links relativos para absolutos.
-    final absoluteLinks = links.map((link) => Uri.parse(link!).toString()).toList();
-
-    return absoluteLinks;
-  }
-
-  static List<Element> _getElementsByClassName(
-      String html, String className1, String className2) {
-    final document = parseFragment(html);
-    final elements = document.querySelectorAll(
-        'body > div.main > div.mw > div.main-content > div.result-list > div > div.r > a.r > h3');
-    return elements.where((element) =>
-    element.classes.contains(className1) && element.classes.contains(className2)).toList();
+    List<Item> result = [];
+    List<html.Element> h3List = document.querySelectorAll('h3');
+    for (html.Element h3 in h3List) {
+      String title = (((h3.nodes)[0] as html.Element).nodes)[0].toString();
+      String? href = (h3.parentNode?.parentNode?.parentNode as html.Element)
+          .attributes['href'];
+      print(href);
+      if (href != null) {
+        String? url = href.replaceAll("/url?q=", ""); //corta o inicio do link, começando pelo http...
+        url = url.substring(0, url.indexOf("&sa"));   //corta a string até o valor "&sa"
+        result.add(Item(
+            title: title,
+            link: Uri.decodeFull(Uri.decodeFull(url)) // decode 2 vzs porque de alguma forma o google estava fazendo 2 encodes no href.
+            ));
+      }
+    }
+    return result;
   }
 }

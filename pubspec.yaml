@@ -37,13 +37,16 @@ dependencies:
   cupertino_icons: ^1.0.2
   http: ^1.2.1
   html: ^0.15.4
+  url_launcher: ^6.2.5
 
   # STATE MANAGEMENT
   get: ^4.6.6
 
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
+
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
