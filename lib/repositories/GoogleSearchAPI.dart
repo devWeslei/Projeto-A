@@ -22,17 +22,13 @@ class GoogleSearchAPI {
     // esta era a estrutura atual da pagina resultado de busca do google:
     //
     // <div>
-    //  <a>
-    //     <div>
+    //    <a href="link associado ao titulo"></a>
+    //      <div>
     //         <div>
-    //          <h3>Título</h3>       *Leitura: Título esta no elemento H3 > nodes[list no indice 0].toString();
-    //         </div>                         e Linke associado está no H3 > div pai > div pai > elemento a > div
-    //     </div>                                                           > "href" -> "Link associado ao título"
-    //
-    //     <div>
-    //       "href" -> "Link associado ao título"
-    //     </div>
-    //  </a>
+    //            <h3>Título</h3>    *Leitura: Título esta no child do elemento: H3 > nodes[list no indice 0].toString();
+    //         </div>                e Link associado está 3 niveis acima: H3 > parent (div) > parent (div) > parent (a) > href = "link associado ao titulo"
+    //      </div>
+    //    </a>
     // </div>
 
     List<Item> result = [];
@@ -41,7 +37,6 @@ class GoogleSearchAPI {
       String title = (((h3.nodes)[0] as html.Element).nodes)[0].toString();
       String? href = (h3.parentNode?.parentNode?.parentNode as html.Element)
           .attributes['href'];
-      print(href);
       if (href != null) {
         String? url = href.replaceAll("/url?q=", ""); //corta o inicio do link, começando pelo http...
         url = url.substring(0, url.indexOf("&sa"));   //corta a string até o valor "&sa"
