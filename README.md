@@ -1,8 +1,8 @@
-# Projeto A    
+# Projeto A       
 
-## Demo    
-<p align="center">
-  <img alt="Demo" src="https://github.com/devWeslei/Projeto-A/blob/main/lib/assets/demo.gif">
+## Demo       
+<p align="center">   
+  <img alt="Demo" src="https://github.com/devWeslei/Projeto-A/blob/main/lib/assets/demo.gif "min-height="480px" max-height="600px" height="600px">   
 </p>
 
 ## Sobre o projeto    
@@ -31,8 +31,10 @@ App usando:
 `git clone https://github.com/devWeslei/Projeto-A.git`   
 
 ## import as dependências:   
-`flutter pub get`    
-
+`flutter pub get`   
+   
+>OBS: Para rodar este aplicativo, seu dispositivo precisa ter suporte para a API do Dart 2.19.2 ou superior.     
+   
 ## rode a aplicação:
 `flutter run`   
 
