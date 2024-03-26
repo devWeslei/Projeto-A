@@ -12,12 +12,7 @@ class HomeController extends GetxController {
     // Limpa a lista de resultados antes de cada nova busca
     results.clear();
 
-    // Realiza a busca usando a API
-    final List<Map<String, String?>> data =
-        await googleSearchApi.search(searchText.value);
-
-    // Converte a lista de mapas em uma lista de objetos Item
-    final List<Item> items = data.map((item) => Item.fromJson(item)).toList();
+    final List<Item> items = await googleSearchApi.search(searchText.value);
 
     // Atualiza a lista de resultados
     results.addAll(items);

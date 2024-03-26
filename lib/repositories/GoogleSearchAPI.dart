@@ -1,87 +1,56 @@
 import 'package:http/http.dart' as http;
 import 'package:html/parser.dart' as htmlParser;
 import 'package:html/dom.dart' as html;
+import 'package:projeto/models/Item.dart';
 
 class GoogleSearchAPI {
-  Future<List<Map<String, String>>> search(String query) async {
+  Future<List<Item>> search(String query) async {
     final response =
-        await http.get(Uri.parse('https://www.google.com/search?q=$query'));
+    await http.get(Uri.parse('https://www.google.com/search?q=$query'));
     if (response.statusCode == 200) {
       final document = htmlParser.parse(response.body);
 
-      final titles = _extractTitles(document);
-      final links = _extractLinks(document);
-
-      final List<Map<String, String>> results = [];
-
-      for (int i = 0; i < titles.length && i < links.length; i++) {
-        results.add({
-          'title': titles[i] ?? '',
-          // Se o título for nulo, atribuímos uma string vazia
-          'link': links[i] ?? ''
-          // Se o link for nulo, atribuímos uma string vazia
-        });
-      }
-      return results;
+      return extractSearchResults(document);
     } else {
       throw Exception('Failed to load data');
     }
   }
 
-  List<String> _extractTitles(html.Document document) {
-    return document
-        .querySelectorAll('h3')
-        .map((element) => element.text)
-        .toList();
-  }
+  List<Item> extractSearchResults(html.Document document) {
+    // Esse codigo navega a estrutura html da pagina de resultados do google para descobrir
+    // os titulos e os links associados aos titulos. No momento de implementacao desse metodo
+    // esta era a estrutura atual da pagina resultado de busca do google:
+    //
+    // <div>
+    //  <a>
+    //     <div>
+    //         <div>
+    //          <h3>Título</h3>       *Leitura: Título esta no elemento H3 > nodes[list no indice 0].toString();
+    //         </div>                         e Linke associado está no H3 > div pai > div pai > elemento a > div
+    //     </div>                                                           > "href" -> "Link associado ao título"
+    //
+    //     <div>
+    //       "href" -> "Link associado ao título"
+    //     </div>
+    //  </a>
+    // </div>
 
-  List<String?> _extractLinks(html.Document document) {
-    final List<String?> links = [];
-
-    // Encontrar todos os links dentro dos elementos com classe 'tF2Cxc'
-    final RegExp regExp = RegExp(r'<a href="/url\?q=(.*?)&');
-    final Iterable<RegExpMatch> matches = regExp.allMatches(document.outerHtml);
-
-    // Iterar sobre as correspondências e extrair os links
-    for (RegExpMatch match in matches) {
-      final link = match.group(1);
-      if (link != null) {
-        links.add(Uri.decodeFull(link));
+    List<Item> result = [];
+    List<html.Element> h3List = document.querySelectorAll('h3');
+    for (html.Element h3 in h3List) {
+      String title = (((h3.nodes)[0] as html.Element).nodes)[0].toString();
+      String? href = (h3.parentNode?.parentNode?.parentNode as html.Element)
+          .attributes['href'];
+      print(href);
+      if (href != null) {
+        String? url = href.replaceAll("/url?q=", ""); //corta o inicio do link, começando pelo http...
+        url = url.substring(0, url.indexOf("&sa"));   //corta a string até o valor "&sa"
+        result.add(Item(
+            title: title,
+            link: Uri.decodeFull(Uri.decodeFull(url)) // decode 2 vzs porque de alguma forma o google estava fazendo 2 encodes no href.
+            ));
       }
     }
-    return links;
+    return result;
   }
-
-
-
-//////////////////////////////
-
-
-
-//////////////////////////////
-
-
-
-//List<String?> _extractLinks(html.Document document) {
-//return document.querySelectorAll('a').map((element) => element.attributes['href']).toList();
-
-//   final List<String?> links = [];
-//
-//   // Seleciona todos os elementos 'a' dentro do documento
-//   final elements = document.querySelectorAll('a');
-//
-//   // Itera sobre os elementos 'a' e extrai o atributo 'href' (link)
-//   for (var element in elements) {
-//     final link = element.attributes['href'];
-//
-//     // Verifica se a URL começa com 'https://www.google.com/'
-//     // Se não, adiciona esse prefixo à URL
-//     if (link != null && !link.startsWith('https://www.google.com/')) {
-//       links.add('https://www.google.com$link');
-//     } else {
-//       links.add(link);
-//     }
-//   }
-//   return links;
-// }
 }
