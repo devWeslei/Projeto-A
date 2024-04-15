@@ -30,7 +30,7 @@ App usando:
 ## baixe o projeto pelo terminal, digite:   
 `git clone https://github.com/devWeslei/Projeto-A.git`   
 
-## import as dependências:   
+## importe as dependências:   
 `flutter pub get`   
    
 >OBS: Para rodar este aplicativo, seu dispositivo precisa ter suporte para a API do Dart 2.19.2 ou superior.     
